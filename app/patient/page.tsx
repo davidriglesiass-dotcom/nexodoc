@@ -114,6 +114,21 @@ export default function PatientHome() {
           </Link>
         ))}
       </div>
+
+      {/* Upgrade nudge */}
+      <Link href="/patient/upgrade" style={{ textDecoration: 'none' }}>
+        <div style={s.upgradeNudge}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 700, fontSize: 14, color: '#1B3A6B', marginBottom: 2 }}>
+              ⭐ Desbloquea el resumen mensual de Dani
+            </div>
+            <div style={{ fontSize: 12, color: '#7B8499' }}>
+              Diario avanzado · Especialistas IA · Gráficos de tendencias
+            </div>
+          </div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: '#1B3A6B' }}>$4.99 →</div>
+        </div>
+      </Link>
     </div>
   );
 }
@@ -132,4 +147,5 @@ const s: Record<string, React.CSSProperties> = {
   sectionTitle: { fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: .5, color: '#7B8499', marginBottom: 12 },
   quickGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 },
   quickCard: { background: '#fff', borderRadius: 16, padding: '20px 18px', border: '1.5px solid #EEF0F4', cursor: 'pointer', transition: 'border-color .15s' },
+  upgradeNudge: { background: '#EBF1FB', border: '1.5px solid #2D5FA6', borderRadius: 14, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 12, marginTop: 8, cursor: 'pointer' },
 };
