@@ -46,8 +46,8 @@ export default function UpgradeModal({ feature, onClose }: Props) {
 
           {/* CTA */}
           <button style={{ ...s.cta, background: plan.id === 'plus' ? '#1B3A6B' : '#7C3AED' }}
-            onClick={() => alert('Pasarela de pago — próximamente. Por ahora disfruta el demo gratuito.')}>
-            Activar {plan.nombre} — {plan.precio}
+            onClick={() => window.location.href = '/patient/upgrade'}>
+            Ver planes — {plan.precio}
           </button>
           <button style={s.skip} onClick={onClose}>Continuar con Free</button>
         </div>
