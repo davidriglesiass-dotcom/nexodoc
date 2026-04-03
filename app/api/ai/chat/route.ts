@@ -21,7 +21,7 @@ export async function POST(req: Request) {
     const client = new Anthropic({ apiKey });
 
     const stream = client.messages.stream({
-      model: 'claude-opus-4-5',
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: 1024,
       system,
       messages: messages.map(m => ({ role: m.role, content: m.content })),
@@ -39,8 +39,9 @@ export async function POST(req: Request) {
               controller.enqueue(encoder.encode('data: {"type":"done"}\n\n'));
             }
           }
-        } catch {
-          controller.enqueue(encoder.encode('data: {"type":"error"}\n\n'));
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : 'Error desconocido';
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'error', message: msg })}\n\n`));
         } finally {
           controller.close();
         }
@@ -54,7 +55,9 @@ export async function POST(req: Request) {
         Connection: 'keep-alive',
       },
     });
-  } catch {
-    return Response.json({ error: 'Error interno' }, { status: 500 });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Error interno';
+    console.error('AI route error:', msg);
+    return Response.json({ error: msg }, { status: 500 });
   }
 }
