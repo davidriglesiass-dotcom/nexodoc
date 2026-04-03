@@ -12,6 +12,7 @@ const NAV = [
 ];
 
 const BOTTOM = [
+  { href: '/patient/upgrade',  icon: '⭐', label: 'Mejorar plan', highlight: true },
   { href: '/patient/profile',  icon: '👤', label: 'Mi Perfil' },
   { href: '/patient/settings', icon: '⚙️', label: 'Configuración' },
 ];
@@ -93,9 +94,21 @@ export default function Sidebar({ nombre = 'Paciente', puntos = 120 }: { nombre?
             const active = path.startsWith(item.href);
             return (
               <Link key={item.href} href={item.href} style={{ textDecoration: 'none' }}>
-                <div style={{ ...s.navItem, ...(active ? s.navActive : {}) }}>
+                <div style={{
+                  ...s.navItem,
+                  ...(active ? s.navActive : {}),
+                  ...('highlight' in item && item.highlight ? {
+                    background: 'rgba(125,211,200,0.15)',
+                    border: '1px solid rgba(125,211,200,0.3)',
+                    marginBottom: 4,
+                  } : {}),
+                }}>
                   <span style={{ fontSize: 16 }}>{item.icon}</span>
-                  <span style={{ fontSize: 13, fontWeight: active ? 600 : 400 }}>{item.label}</span>
+                  <span style={{
+                    fontSize: 13,
+                    fontWeight: active ? 600 : ('highlight' in item && item.highlight ? 600 : 400),
+                    color: 'highlight' in item && item.highlight ? '#7DD3C8' : undefined,
+                  }}>{item.label}</span>
                 </div>
               </Link>
             );
