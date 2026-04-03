@@ -4,7 +4,7 @@ import { PLANS, PlanId } from '@/lib/plans';
 
 export default function UpgradePage() {
   const [selected, setSelected] = useState<PlanId>('plus');
-  const current: PlanId = 'free'; // Mock — René reemplaza con plan real del usuario
+  const current: string = 'free'; // Mock — René reemplaza con plan real del usuario
 
   return (
     <div style={s.page}>
