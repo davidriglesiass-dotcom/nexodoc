@@ -433,10 +433,10 @@ footer{background:var(--negro);padding:56px 0 32px;}
     <span class="nav-brand-text">biem<span>star</span></span>
   </a>
   <div class="nav-links">
-    <a class="nav-link" href="#solucion" onclick="scrollTo('solucion');return false;">Plataforma</a>
-    <a class="nav-link" href="#como" onclick="scrollTo('como');return false;">Cómo funciona</a>
-    <a class="nav-link" href="#paciente" onclick="scrollTo('paciente');return false;">Para pacientes</a>
-    <a class="nav-link" href="#pricing" onclick="scrollTo('pricing');return false;">Precios</a>
+    <a class="nav-link" href="#solucion" onclick="scrollToSection('solucion');return false;">Plataforma</a>
+    <a class="nav-link" href="#como" onclick="scrollToSection('como');return false;">Cómo funciona</a>
+    <a class="nav-link" href="#paciente" onclick="scrollToSection('paciente');return false;">Para pacientes</a>
+    <a class="nav-link" href="#pricing" onclick="scrollToSection('pricing');return false;">Precios</a>
   </div>
   <div class="nav-right">
     <a class="nav-btn-sec" href="https://biemstar.com/docmonitor/public/login.php">Iniciar sesión</a>
@@ -810,20 +810,19 @@ footer{background:var(--negro);padding:56px 0 32px;}
       </div>
       <div>
         <div class="footer-col-title">Plataforma</div>
-        <a class="footer-link" href="#">DocMonitor</a>
-        <a class="footer-link" href="#">App del paciente</a>
-        <a class="footer-link" href="#">Precios</a>
+        <a class="footer-link" href="#solucion" onclick="scrollToSection('solucion');return false;">DocMonitor</a>
+        <a class="footer-link" href="#paciente" onclick="scrollToSection('paciente');return false;">NexoDoc — App del paciente</a>
+        <a class="footer-link" href="#pricing" onclick="scrollToSection('pricing');return false;">Precios</a>
       </div>
       <div>
         <div class="footer-col-title">Empresa</div>
-        <a class="footer-link" href="#">Sobre MiDocLink</a>
-        <a class="footer-link" href="#">Blog</a>
-        <a class="footer-link" href="#">Contacto</a>
+        <a class="footer-link" href="#" onclick="openDemo();return false;">Sobre MiDocLink</a>
+        <a class="footer-link" href="mailto:soporte@midoclink.com">Contacto</a>
       </div>
       <div>
         <div class="footer-col-title">Legal</div>
         <a class="footer-link" href="https://pacienteplanes.vercel.app/privacidad.html#terminos" target="_blank" rel="noopener">Términos de uso</a>
-        <a class="footer-link" href="https://pacienteplanes.vercel.app/privacidad.html" target="_blank" rel="noopener">Privacidad</a>
+        <a class="footer-link" href="https://pacienteplanes.vercel.app/privacidad.html" target="_blank" rel="noopener">Política de privacidad</a>
         <a class="footer-link" href="https://pacienteplanes.vercel.app/privacidad.html#medicos" target="_blank" rel="noopener">Datos médicos</a>
       </div>
     </div>
@@ -885,7 +884,7 @@ footer{background:var(--negro);padding:56px 0 32px;}
 <div class="toast" id="toast-el"></div>
 
 <script>
-function scrollTo(id) {
+function scrollToSection(id) {
   const el = document.getElementById(id);
   if (!el) return;
   const offset = 68;
