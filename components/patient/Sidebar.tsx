@@ -75,9 +75,10 @@ export default function Sidebar({ nombre = 'Paciente', puntos = 120 }: { nombre?
           <div style={s.navLabel}>Menú</div>
           {NAV.map(item => {
             const active = path === item.href || (item.href !== '/patient' && path.startsWith(item.href));
+            const tourId = `tour-nav-${item.href.split('/').pop()}`;
             return (
               <Link key={item.href} href={item.href} style={{ textDecoration: 'none' }}>
-                <div style={{ ...s.navItem, ...(active ? s.navActive : {}) }}>
+                <div id={tourId} style={{ ...s.navItem, ...(active ? s.navActive : {}) }}>
                   <span style={{ fontSize: 16 }}>{item.icon}</span>
                   <span style={{ fontSize: 13, fontWeight: active ? 600 : 400 }}>{item.label}</span>
                   {item.href === '/patient/habits' && (
