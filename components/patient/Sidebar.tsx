@@ -121,7 +121,7 @@ export default function Sidebar({ nombre = 'Paciente', puntos = 120 }: { nombre?
 
         {/* Footer */}
         <div style={{ padding: '16px 20px', fontSize: 10, color: 'rgba(255,255,255,0.25)', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-          MiDocLink · v2.0
+          NexoDoc · v2.0
         </div>
       </aside>
 
