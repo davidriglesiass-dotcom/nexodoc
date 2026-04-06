@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Sidebar from '@/components/patient/Sidebar';
 
 export const metadata: Metadata = {
-  title: 'MiDocLink — Tu portal de salud',
+  title: 'NexoDoc — Tu portal de salud',
   description: 'Conecta con tu médico, sigue tu tratamiento y cuida tu bienestar.',
 };
 
