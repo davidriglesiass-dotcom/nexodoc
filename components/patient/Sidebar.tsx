@@ -42,7 +42,7 @@ export default function Sidebar({ nombre = 'Paciente', puntos = 120 }: { nombre?
       <aside style={s.sidebar}>
         {/* Brand */}
         <div style={s.brand}>
-          <div style={s.brandName}>MiDoc<span style={{ color: '#7DD3C8' }}>Link</span></div>
+          <div style={s.brandName}>Nexo<span style={{ color: '#7DD3C8' }}>Doc</span></div>
         </div>
 
         {/* User + level */}
