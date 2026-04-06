@@ -39,7 +39,7 @@ export default function PatientLogin() {
   return (
     <div style={s.bg}>
       <div style={s.card}>
-        <div style={s.logo}>MiDoc<span style={{ color: '#7DD3C8' }}>Link</span></div>
+        <div style={s.logo}>Nexo<span style={{ color: '#7DD3C8' }}>Doc</span></div>
         <p style={s.sub}>Tu portal de salud personalizado</p>
 
         <div style={s.pills}>
