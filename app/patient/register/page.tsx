@@ -38,9 +38,9 @@ function RegisterForm() {
   return (
     <div style={s.bg}>
       <div style={s.card}>
-        <div style={s.logo}>MiDoc<span style={{ color: '#7DD3C8' }}>Link</span></div>
+        <div style={s.logo}>Nexo<span style={{ color: '#7DD3C8' }}>Doc</span></div>
         <p style={s.sub}>Crea tu cuenta y empieza a cuidarte</p>
-        {doctorToken && <div style={s.docBadge}>🩺 Te registras con tu médico de MiDocLink</div>}
+        {doctorToken && <div style={s.docBadge}>🩺 Te registras con tu médico de ConectoSalud</div>}
         <button style={s.google} onClick={() => alert('Google OAuth — próximamente')}>
           <GoogleSVG /> Registrarse con Google
         </button>
@@ -56,7 +56,7 @@ function RegisterForm() {
           </Field>
           <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12, color: '#7B8499', marginBottom: 16, cursor: 'pointer' }}>
             <input type="checkbox" required style={{ marginTop: 2 }} />
-            Acepto los términos y la política de privacidad de MiDocLink
+            Acepto los términos y la política de privacidad de ConectoSalud
           </label>
           <button type="submit" style={s.submit} disabled={loading}>{loading ? 'Creando cuenta...' : 'Crear cuenta'}</button>
         </form>
