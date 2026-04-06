@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Onboarding from '@/components/patient/Onboarding';
 
 const MOCK_HABIT = { text: 'Toma un vaso de agua ahora 💧', pts: 5 };
 const MOCK_STREAK = 7;
@@ -29,6 +30,7 @@ export default function PatientHome() {
 
   return (
     <div style={s.page}>
+      <Onboarding nombre="Alejandra" />
       {/* Header */}
       <div style={s.hdr}>
         <div>
