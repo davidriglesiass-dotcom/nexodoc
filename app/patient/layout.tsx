@@ -18,13 +18,16 @@ export default function PatientLayout({ children }: { children: React.ReactNode 
             .sidebar { display: none !important; }
             .mobile-bar { display: flex !important; }
             .main-content { margin-left: 0 !important; padding-bottom: 70px !important; }
+            .main-inner { max-width: 100% !important; padding: 0 !important; }
           }
         `}</style>
       </head>
       <body>
         <Sidebar />
         <main className="main-content" style={{ marginLeft: 240, minHeight: '100vh', background: '#F8F9FB' }}>
-          {children}
+          <div className="main-inner" style={{ maxWidth: 1080, margin: '0 auto' }}>
+            {children}
+          </div>
         </main>
       </body>
     </html>
