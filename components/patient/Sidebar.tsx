@@ -2,6 +2,7 @@
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useState, useEffect } from 'react';
 
 const NAV = [
   { href: '/patient',         icon: '🏠', label: 'Inicio' },
@@ -30,29 +31,47 @@ function getLevel(pts: number) {
   return LEVELS.find(l => pts >= l.min && pts <= l.max) ?? LEVELS[0];
 }
 
-export default function Sidebar({ nombre = 'Isabella Iglesias', puntos = 120 }: { nombre?: string; puntos?: number }) {
+export default function Sidebar() {
   const path = usePathname();
+  const [nombre, setNombre] = useState('Paciente');
+  const [puntos, setPuntos] = useState(0);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('mnx_user');
+    if (stored) {
+      const user = JSON.parse(stored);
+      if (user.nombre) setNombre(user.nombre.split(' ')[0]);
+      if (user.puntos !== undefined) setPuntos(user.puntos);
+    }
+    // Escuchar cambios de puntos en tiempo real
+    function onStorage() {
+      const s = localStorage.getItem('mnx_user');
+      if (s) {
+        const u = JSON.parse(s);
+        if (u.nombre) setNombre(u.nombre.split(' ')[0]);
+        if (u.puntos !== undefined) setPuntos(u.puntos);
+      }
+    }
+    window.addEventListener('storage', onStorage);
+    window.addEventListener('mnx_update', onStorage);
+    return () => {
+      window.removeEventListener('storage', onStorage);
+      window.removeEventListener('mnx_update', onStorage);
+    };
+  }, []);
+
   const level = getLevel(puntos);
   const nextLevel = LEVELS[LEVELS.indexOf(level) + 1];
   const progress = nextLevel ? Math.round(((puntos - level.min) / (nextLevel.min - level.min)) * 100) : 100;
 
   return (
     <>
-      {/* Desktop sidebar */}
       <aside className="sidebar" style={s.sidebar}>
-        {/* Brand — logo imagen */}
         <div style={s.brand}>
-          <Image
-            src="/logo_sidebar.png"
-            alt="MiNexoSalud"
-            width={160}
-            height={48}
-            style={{ objectFit: 'contain', display: 'block' }}
-            priority
-          />
+          <Image src="/logo_sidebar.png" alt="MiNexoSalud" width={160} height={48}
+            style={{ objectFit: 'contain', display: 'block' }} priority />
         </div>
 
-        {/* User + level */}
         <div style={s.userBox}>
           <div style={s.avatar}>{nombre[0]?.toUpperCase()}</div>
           <div style={{ flex: 1, minWidth: 0 }}>
@@ -63,7 +82,6 @@ export default function Sidebar({ nombre = 'Isabella Iglesias', puntos = 120 }: 
           </div>
         </div>
 
-        {/* Level progress bar */}
         <div style={s.levelBar}>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>
             <span>{level.label}</span>
@@ -77,7 +95,6 @@ export default function Sidebar({ nombre = 'Isabella Iglesias', puntos = 120 }: 
           </div>
         </div>
 
-        {/* Main nav */}
         <nav style={{ flex: 1, padding: '8px 12px' }}>
           <div style={s.navLabel}>Menú</div>
           {NAV.map(item => {
@@ -96,7 +113,6 @@ export default function Sidebar({ nombre = 'Isabella Iglesias', puntos = 120 }: 
             );
           })}
 
-          {/* Bottom nav */}
           <div style={{ ...s.navLabel, marginTop: 20 }}>Cuenta</div>
           {BOTTOM.map(item => {
             const active = path.startsWith(item.href);
@@ -105,35 +121,25 @@ export default function Sidebar({ nombre = 'Isabella Iglesias', puntos = 120 }: 
                 <div style={{
                   ...s.navItem,
                   ...(active ? s.navActive : {}),
-                  ...('highlight' in item && item.highlight ? {
-                    background: 'rgba(153,221,199,0.15)',
-                    border: '1px solid rgba(153,221,199,0.3)',
-                    marginBottom: 4,
-                  } : {}),
+                  ...('highlight' in item && item.highlight ? { background: 'rgba(153,221,199,0.15)', border: '1px solid rgba(153,221,199,0.3)', marginBottom: 4 } : {}),
                 }}>
                   <span style={{ fontSize: 16 }}>{item.icon}</span>
-                  <span style={{
-                    fontSize: 13,
-                    fontWeight: active ? 600 : ('highlight' in item && item.highlight ? 600 : 400),
-                    color: 'highlight' in item && item.highlight ? '#99DDC7' : undefined,
-                  }}>{item.label}</span>
+                  <span style={{ fontSize: 13, fontWeight: active ? 600 : ('highlight' in item && item.highlight ? 600 : 400), color: 'highlight' in item && item.highlight ? '#99DDC7' : undefined }}>{item.label}</span>
                 </div>
               </Link>
             );
           })}
-          <div style={{ ...s.navItem, cursor: 'pointer', marginTop: 4 }} onClick={() => { localStorage.removeItem('mdl_token'); window.location.href = '/patient/login'; }}>
+          <div style={{ ...s.navItem, cursor: 'pointer', marginTop: 4 }} onClick={() => { localStorage.removeItem('mdl_token'); localStorage.removeItem('mnx_user'); window.location.href = '/patient/login'; }}>
             <span style={{ fontSize: 16 }}>🚪</span>
             <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>Cerrar sesión</span>
           </div>
         </nav>
 
-        {/* Footer */}
         <div style={{ padding: '16px 20px', fontSize: 10, color: 'rgba(255,255,255,0.25)', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
           MiNexoSalud · v2.0
         </div>
       </aside>
 
-      {/* Mobile bottom bar */}
       <div className="mobile-bar" style={s.mobileBar}>
         {NAV.slice(0, 5).map(item => {
           const active = path === item.href || (item.href !== '/patient' && path.startsWith(item.href));
