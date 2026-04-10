@@ -31,10 +31,20 @@ function getLevel(pts: number) {
   return LEVELS.find(l => pts >= l.min && pts <= l.max) ?? LEVELS[0];
 }
 
+// Items en barra móvil (4 fijos + botón Más)
+const MOBILE_NAV = NAV.slice(0, 4);
+
+// Items que van en el drawer "Más"
+const MORE_ITEMS = [
+  ...NAV.slice(4),
+  ...BOTTOM,
+];
+
 export default function Sidebar() {
   const path = usePathname();
   const [nombre, setNombre] = useState('Paciente');
   const [puntos, setPuntos] = useState(0);
+  const [showMore, setShowMore] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem('mnx_user');
@@ -43,7 +53,6 @@ export default function Sidebar() {
       if (user.nombre) setNombre(user.nombre.split(' ')[0]);
       if (user.puntos !== undefined) setPuntos(user.puntos);
     }
-    // Escuchar cambios de puntos en tiempo real
     function onStorage() {
       const s = localStorage.getItem('mnx_user');
       if (s) {
@@ -66,6 +75,7 @@ export default function Sidebar() {
 
   return (
     <>
+      {/* Desktop sidebar */}
       <aside className="sidebar" style={s.sidebar}>
         <div style={s.brand}>
           <Image src="/logo_sidebar.png" alt="MiNexoSalud" width={160} height={48}
@@ -129,7 +139,8 @@ export default function Sidebar() {
               </Link>
             );
           })}
-          <div style={{ ...s.navItem, cursor: 'pointer', marginTop: 4 }} onClick={() => { localStorage.removeItem('mdl_token'); localStorage.removeItem('mnx_user'); window.location.href = '/patient/login'; }}>
+          <div style={{ ...s.navItem, cursor: 'pointer', marginTop: 4 }}
+            onClick={() => { localStorage.removeItem('mdl_token'); localStorage.removeItem('mnx_user'); window.location.href = '/patient/login'; }}>
             <span style={{ fontSize: 16 }}>🚪</span>
             <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>Cerrar sesión</span>
           </div>
@@ -140,8 +151,9 @@ export default function Sidebar() {
         </div>
       </aside>
 
+      {/* Mobile bottom bar */}
       <div className="mobile-bar" style={s.mobileBar}>
-        {NAV.slice(0, 5).map(item => {
+        {MOBILE_NAV.map(item => {
           const active = path === item.href || (item.href !== '/patient' && path.startsWith(item.href));
           return (
             <Link key={item.href} href={item.href} style={{ textDecoration: 'none', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '8px 0' }}>
@@ -150,7 +162,46 @@ export default function Sidebar() {
             </Link>
           );
         })}
+        {/* Botón Más */}
+        <button onClick={() => setShowMore(true)}
+          style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '8px 0', background: 'none', border: 'none', cursor: 'pointer' }}>
+          <span style={{ fontSize: 20, opacity: 0.5 }}>••• </span>
+          <span style={{ fontSize: 9, fontWeight: 600, color: '#7B8499' }}>Más</span>
+        </button>
       </div>
+
+      {/* Drawer "Más" */}
+      {showMore && (
+        <div style={s.overlay} onClick={() => setShowMore(false)}>
+          <div style={s.drawer} onClick={e => e.stopPropagation()}>
+            <div style={{ width: 32, height: 4, background: '#D5DAE4', borderRadius: 2, margin: '0 auto 20px' }} />
+            <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: 1, color: '#7B8499', marginBottom: 12 }}>Más opciones</div>
+            {MORE_ITEMS.map(item => {
+              const active = path === item.href || (item.href !== '/patient' && path.startsWith(item.href));
+              return (
+                <Link key={item.href} href={item.href} style={{ textDecoration: 'none' }} onClick={() => setShowMore(false)}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 4px', borderBottom: '1px solid #EEF0F4', color: active ? '#1B3A6B' : '#3D4457' }}>
+                    <span style={{ fontSize: 22 }}>{item.icon}</span>
+                    <span style={{ fontSize: 15, fontWeight: active ? 700 : 400 }}>{item.label}</span>
+                    {item.href === '/patient/habits' && (
+                      <span style={{ marginLeft: 'auto', background: '#99DDC7', color: '#1B3A6B', fontSize: 9, fontWeight: 700, padding: '2px 8px', borderRadius: 100 }}>HOY</span>
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 4px', color: '#C0392B', cursor: 'pointer' }}
+              onClick={() => { localStorage.removeItem('mdl_token'); localStorage.removeItem('mnx_user'); window.location.href = '/patient/login'; }}>
+              <span style={{ fontSize: 22 }}>🚪</span>
+              <span style={{ fontSize: 15 }}>Cerrar sesión</span>
+            </div>
+            <button onClick={() => setShowMore(false)}
+              style={{ width: '100%', marginTop: 16, padding: '14px', background: '#EEF0F4', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 600, color: '#7B8499', cursor: 'pointer', fontFamily: "'Sora',sans-serif" }}>
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }
@@ -165,4 +216,6 @@ const s: Record<string, React.CSSProperties> = {
   navItem: { display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', borderRadius: 8, color: 'rgba(255,255,255,0.65)', marginBottom: 2, cursor: 'pointer', transition: 'all .15s' },
   navActive: { background: 'rgba(255,255,255,0.12)', color: '#FFFFFF' },
   mobileBar: { display: 'none', position: 'fixed', bottom: 0, left: 0, right: 0, background: '#FFFFFF', borderTop: '1px solid #EEF0F4', zIndex: 50, flexDirection: 'row' as const, fontFamily: "'Sora',sans-serif" },
+  overlay: { position: 'fixed', inset: 0, background: 'rgba(17,24,39,0.5)', zIndex: 100, display: 'flex', alignItems: 'flex-end' },
+  drawer: { background: '#fff', borderRadius: '20px 20px 0 0', padding: '16px 20px 32px', width: '100%', maxHeight: '80vh', overflowY: 'auto' as const, fontFamily: "'Sora',sans-serif" },
 };
