@@ -30,7 +30,7 @@ function getLevel(pts: number) {
   return LEVELS.find(l => pts >= l.min && pts <= l.max) ?? LEVELS[0];
 }
 
-export default function Sidebar({ nombre = 'Isabella Chur', puntos = 120 }: { nombre?: string; puntos?: number }) {
+export default function Sidebar({ nombre = 'Isabella Iglesias', puntos = 120 }: { nombre?: string; puntos?: number }) {
   const path = usePathname();
   const level = getLevel(puntos);
   const nextLevel = LEVELS[LEVELS.indexOf(level) + 1];
