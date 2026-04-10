@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const HABITS_POOL = [
   { text: 'Toma un vaso de agua ahora 💧', pts: 5 },
@@ -35,12 +35,10 @@ const HABITS_POOL = [
 ];
 
 const WEEK_CHALLENGE = {
-  titulo: 'Reto de la semana',
   descripcion: 'Completa todas tus indicaciones médicas 5 días seguidos',
   progreso: 3,
   meta: 5,
   pts: 100,
-  emoji: '💊',
 };
 
 const LEVELS = [
@@ -58,176 +56,204 @@ const HISTORY = [
   { emoji: '🔥', texto: 'Racha de 7 días', pts: 50, hora: 'Hace 2 días' },
 ];
 
+function getTodayHabit() {
+  const dayIndex = Math.floor(Date.now() / 86400000);
+  return HABITS_POOL[dayIndex % HABITS_POOL.length];
+}
+
 export default function HabitsPage() {
-  const [puntos, setPuntos] = useState(120);
-  const [habitIdx] = useState(Math.floor(Date.now() / 86400000) % HABITS_POOL.length);
+  const [puntos, setPuntos] = useState(0);
   const [habitDone, setHabitDone] = useState(false);
   const [animating, setAnimating] = useState(false);
 
-  const habit = HABITS_POOL[habitIdx];
+  const habit = getTodayHabit();
+  const todayKey = `habit_${Math.floor(Date.now() / 86400000)}`;
   const level = [...LEVELS].reverse().find(l => puntos >= l.min) ?? LEVELS[0];
   const nextLevel = LEVELS[LEVELS.findIndex(l => l.label === level.label) + 1];
   const progress = nextLevel ? Math.round(((puntos - level.min) / (nextLevel.min - level.min)) * 100) : 100;
 
+  useEffect(() => {
+    const stored = localStorage.getItem('mnx_user');
+    if (stored) {
+      const user = JSON.parse(stored);
+      if (user.puntos !== undefined) setPuntos(user.puntos);
+      if (user[todayKey]) setHabitDone(true);
+    }
+  }, []);
+
   async function doHabit() {
+    if (habitDone) return;
     setAnimating(true);
     try {
       const c = (await import('canvas-confetti')).default;
       c({ particleCount: 100, spread: 70, origin: { y: 0.5 }, colors: ['#0E8A7A', '#7DD3C8', '#16A34A'] });
     } catch {}
     setTimeout(() => {
+      const stored = localStorage.getItem('mnx_user');
+      const user = stored ? JSON.parse(stored) : { puntos: 0 };
+      user.puntos = (user.puntos || 0) + habit.pts;
+      user[todayKey] = true;
+      localStorage.setItem('mnx_user', JSON.stringify(user));
+      window.dispatchEvent(new Event('mnx_update'));
+      setPuntos(user.puntos);
       setHabitDone(true);
-      setPuntos(p => p + habit.pts);
       setAnimating(false);
     }, 400);
   }
 
   return (
-    <div style={s.page}>
-      <div style={{ marginBottom: 24 }}>
-        <h1 style={s.h1}>⚡ Minihábitos</h1>
-        <p style={s.sub}>Pequeñas acciones para tomar control de tu salud</p>
-      </div>
+    <>
+      <style>{`
+        @media (max-width: 768px) {
+          .habits-page { padding: 20px 16px !important; }
+          .habits-two-col { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
+      <div className="habits-page" style={s.page}>
+        <div style={{ marginBottom: 24 }}>
+          <h1 style={s.h1}>⚡ Minihábitos</h1>
+          <p style={s.sub}>Pequeñas acciones para tomar control de tu salud</p>
+        </div>
 
-      <div style={s.twoCol}>
-        {/* Columna izquierda */}
-        <div>
-          {/* Nivel actual */}
-          <div style={{ ...s.levelCard, background: `linear-gradient(135deg, ${level.color}, ${level.color}CC)` }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-              <div style={{ fontSize: 52 }}>{level.emoji}</div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: 1, color: 'rgba(255,255,255,0.6)', marginBottom: 4 }}>Tu nivel</div>
-                <div style={{ fontFamily: "'Lora',serif", fontSize: 28, fontWeight: 600, color: '#fff' }}>{level.label}</div>
-                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', marginTop: 2, fontStyle: 'italic' }}>Dueño de tu salud</div>
-                <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.8)', marginTop: 4 }}>{puntos} puntos totales</div>
+        <div className="habits-two-col" style={s.twoCol}>
+          {/* Columna izquierda */}
+          <div>
+            {/* Nivel actual */}
+            <div style={{ ...s.levelCard, background: `linear-gradient(135deg, ${level.color}, ${level.color}CC)` }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                <div style={{ fontSize: 52 }}>{level.emoji}</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: 1, color: 'rgba(255,255,255,0.6)', marginBottom: 4 }}>Tu nivel</div>
+                  <div style={{ fontFamily: "'Lora',serif", fontSize: 28, fontWeight: 600, color: '#fff' }}>{level.label}</div>
+                  <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', marginTop: 2, fontStyle: 'italic' }}>Dueño de tu salud</div>
+                  <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.8)', marginTop: 4 }}>{puntos} puntos totales</div>
+                </div>
+              </div>
+              {nextLevel && (
+                <div style={{ marginTop: 16 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'rgba(255,255,255,0.6)', marginBottom: 6 }}>
+                    <span>Progreso a {nextLevel.emoji} {nextLevel.label}</span>
+                    <span>{progress}%</span>
+                  </div>
+                  <div style={{ height: 6, background: 'rgba(255,255,255,0.2)', borderRadius: 6 }}>
+                    <div style={{ height: '100%', width: `${progress}%`, background: '#99DDC7', borderRadius: 6, transition: 'width .4s' }} />
+                  </div>
+                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>
+                    {nextLevel.min - puntos} pts para subir de nivel
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Minihábito del día */}
+            <div style={s.card}>
+              <div style={s.cardLabel}>✨ Minihábito de hoy</div>
+              {habitDone ? (
+                <div style={{ textAlign: 'center' as const, padding: '20px 0' }}>
+                  <div style={{ fontSize: 48, marginBottom: 12 }}>🎉</div>
+                  <div style={{ fontFamily: "'Lora',serif", fontSize: 20, fontWeight: 600, color: '#0E8A7A', marginBottom: 6 }}>¡Excelente!</div>
+                  <div style={{ fontSize: 14, color: '#7B8499' }}>+{habit.pts} puntos ganados hoy</div>
+                  <div style={{ marginTop: 16, padding: '10px 16px', background: '#E0F5F2', borderRadius: 10, fontSize: 13, color: '#0E8A7A', fontWeight: 600 }}>
+                    Total: {puntos} puntos
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <p style={{ fontSize: 17, fontWeight: 600, color: '#111827', lineHeight: 1.5, margin: '12px 0 20px' }}>
+                    {habit.text}
+                  </p>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 12, color: '#7B8499' }}>Recompensa: <b style={{ color: '#0E8A7A' }}>+{habit.pts} pts</b></span>
+                    <button onClick={doHabit} disabled={animating}
+                      style={{ padding: '10px 20px', background: 'linear-gradient(135deg,#1B3A6B,#2D5FA6)', color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "'Sora',sans-serif" }}>
+                      {animating ? '✨ ...' : '¡Lo hice!'}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Reto semanal */}
+            <div style={s.card}>
+              <div style={s.cardLabel}>🏆 Reto de la semana</div>
+              <p style={{ fontSize: 15, fontWeight: 600, color: '#111827', margin: '10px 0 6px' }}>{WEEK_CHALLENGE.descripcion}</p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#7B8499', marginBottom: 8 }}>
+                <span>Progreso: {WEEK_CHALLENGE.progreso}/{WEEK_CHALLENGE.meta} días</span>
+                <span>+{WEEK_CHALLENGE.pts} pts al completar</span>
+              </div>
+              <div style={{ height: 10, background: '#EEF0F4', borderRadius: 10, overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${(WEEK_CHALLENGE.progreso / WEEK_CHALLENGE.meta) * 100}%`, background: 'linear-gradient(to right,#1B3A6B,#0E8A7A)', borderRadius: 10 }} />
+              </div>
+              <div style={{ display: 'flex', gap: 6, marginTop: 10 }}>
+                {Array.from({ length: WEEK_CHALLENGE.meta }).map((_, i) => (
+                  <div key={i} style={{ flex: 1, height: 8, borderRadius: 4, background: i < WEEK_CHALLENGE.progreso ? '#0E8A7A' : '#EEF0F4' }} />
+                ))}
               </div>
             </div>
-            {nextLevel && (
-              <div style={{ marginTop: 16 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'rgba(255,255,255,0.6)', marginBottom: 6 }}>
-                  <span>Progreso a {nextLevel.emoji} {nextLevel.label}</span>
-                  <span>{progress}%</span>
-                </div>
-                <div style={{ height: 6, background: 'rgba(255,255,255,0.2)', borderRadius: 6 }}>
-                  <div style={{ height: '100%', width: `${progress}%`, background: '#99DDC7', borderRadius: 6, transition: 'width .4s' }} />
-                </div>
-                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>
-                  {nextLevel.min - puntos} pts para subir de nivel
-                </div>
-              </div>
-            )}
           </div>
 
-          {/* Minihábitо del día */}
-          <div style={s.card}>
-            <div style={s.cardLabel}>✨ Minihábito de hoy</div>
-            {habitDone ? (
-              <div style={{ textAlign: 'center' as const, padding: '20px 0' }}>
-                <div style={{ fontSize: 48, marginBottom: 12 }}>🎉</div>
-                <div style={{ fontFamily: "'Lora',serif", fontSize: 20, fontWeight: 600, color: '#0E8A7A', marginBottom: 6 }}>¡Excelente!</div>
-                <div style={{ fontSize: 14, color: '#7B8499' }}>+{habit.pts} puntos ganados hoy</div>
-                <div style={{ marginTop: 16, padding: '10px 16px', background: '#E0F5F2', borderRadius: 10, fontSize: 13, color: '#0E8A7A', fontWeight: 600 }}>
-                  Nuevo total: {puntos} puntos
+          {/* Columna derecha */}
+          <div>
+            {/* Todos los niveles */}
+            <div style={s.card}>
+              <div style={s.cardLabel}>🛡️ Todos los niveles</div>
+              {LEVELS.map((lv, i) => (
+                <div key={lv.label} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: i < LEVELS.length - 1 ? '1px solid #EEF0F4' : 'none', opacity: puntos >= lv.min ? 1 : 0.4 }}>
+                  <div style={{ fontSize: 28 }}>{lv.emoji}</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 600, fontSize: 14, color: lv.color }}>{lv.label}</div>
+                    <div style={{ fontSize: 11, color: '#7B8499' }}>{lv.min} pts{LEVELS[i + 1] ? ` — ${LEVELS[i + 1].min - 1} pts` : '+'}</div>
+                  </div>
+                  {puntos >= lv.min ? (
+                    level.label === lv.label ? (
+                      <span style={{ fontSize: 11, fontWeight: 700, color: lv.color, background: lv.bg, padding: '3px 10px', borderRadius: 100 }}>Actual</span>
+                    ) : (
+                      <span style={{ fontSize: 16 }}>✅</span>
+                    )
+                  ) : (
+                    <span style={{ fontSize: 11, color: '#7B8499' }}>Bloqueado</span>
+                  )}
                 </div>
-              </div>
-            ) : (
-              <>
-                <div style={{ fontSize: 13, color: '#7B8499', marginBottom: 4 }}>Categoría: {habit.categoria}</div>
-                <p style={{ fontSize: 17, fontWeight: 600, color: '#111827', lineHeight: 1.5, margin: '12px 0 20px' }}>
-                  {habit.text}
-                </p>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: 12, color: '#7B8499' }}>Recompensa: <b style={{ color: '#0E8A7A' }}>+{habit.pts} pts</b></span>
-                  <button onClick={doHabit} disabled={animating}
-                    style={{ padding: '10px 20px', background: 'linear-gradient(135deg,#1B3A6B,#2D5FA6)', color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "'Sora',sans-serif" }}>
-                    {animating ? '✨ ...' : '¡Lo hice!'}
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
+              ))}
+            </div>
 
-          {/* Reto semanal */}
-          <div style={s.card}>
-            <div style={s.cardLabel}>🏆 Reto de la semana</div>
-            <p style={{ fontSize: 15, fontWeight: 600, color: '#111827', margin: '10px 0 6px' }}>{WEEK_CHALLENGE.descripcion}</p>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#7B8499', marginBottom: 8 }}>
-              <span>Progreso: {WEEK_CHALLENGE.progreso}/{WEEK_CHALLENGE.meta} días</span>
-              <span>+{WEEK_CHALLENGE.pts} pts al completar</span>
+            {/* Historial */}
+            <div style={s.card}>
+              <div style={s.cardLabel}>📊 Últimas ganancias</div>
+              {HISTORY.map((h, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 0', borderBottom: i < HISTORY.length - 1 ? '1px solid #EEF0F4' : 'none' }}>
+                  <div style={{ fontSize: 20 }}>{h.emoji}</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13, fontWeight: 500, color: '#111827' }}>{h.texto}</div>
+                    <div style={{ fontSize: 11, color: '#7B8499' }}>{h.hora}</div>
+                  </div>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#0E8A7A' }}>+{h.pts}</span>
+                </div>
+              ))}
             </div>
-            <div style={{ height: 10, background: '#EEF0F4', borderRadius: 10, overflow: 'hidden' }}>
-              <div style={{ height: '100%', width: `${(WEEK_CHALLENGE.progreso / WEEK_CHALLENGE.meta) * 100}%`, background: 'linear-gradient(to right,#1B3A6B,#0E8A7A)', borderRadius: 10, transition: 'width .4s' }} />
-            </div>
-            <div style={{ display: 'flex', gap: 6, marginTop: 10 }}>
-              {Array.from({ length: WEEK_CHALLENGE.meta }).map((_, i) => (
-                <div key={i} style={{ flex: 1, height: 8, borderRadius: 4, background: i < WEEK_CHALLENGE.progreso ? '#0E8A7A' : '#EEF0F4' }} />
+
+            {/* Cómo ganar puntos */}
+            <div style={s.card}>
+              <div style={s.cardLabel}>💡 ¿Cómo ganar puntos?</div>
+              {[
+                { emoji: '💊', accion: 'Marcar indicación cumplida', pts: '+10' },
+                { emoji: '📅', accion: 'Completar diario de salud', pts: '+15' },
+                { emoji: '🧪', accion: 'Subir examen de laboratorio', pts: '+25' },
+                { emoji: '⚡', accion: 'Completar minihábito del día', pts: '+5' },
+                { emoji: '🔥', accion: 'Racha de 7 días', pts: '+50' },
+                { emoji: '🏆', accion: 'Completar reto semanal', pts: '+100' },
+              ].map((item, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: i < 5 ? '1px solid #EEF0F4' : 'none' }}>
+                  <span style={{ fontSize: 18 }}>{item.emoji}</span>
+                  <span style={{ flex: 1, fontSize: 12, color: '#3D4457' }}>{item.accion}</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: '#0E8A7A' }}>{item.pts}</span>
+                </div>
               ))}
             </div>
           </div>
         </div>
-
-        {/* Columna derecha */}
-        <div>
-          {/* Todos los niveles */}
-          <div style={s.card}>
-            <div style={s.cardLabel}>🛡️ Todos los niveles</div>
-            {LEVELS.map((lv, i) => (
-              <div key={lv.label} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: i < LEVELS.length - 1 ? '1px solid #EEF0F4' : 'none', opacity: puntos >= lv.min ? 1 : 0.4 }}>
-                <div style={{ fontSize: 28 }}>{lv.emoji}</div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 600, fontSize: 14, color: lv.color }}>{lv.label}</div>
-                  <div style={{ fontSize: 11, color: '#7B8499' }}>{lv.min} pts{LEVELS[i + 1] ? ` — ${LEVELS[i + 1].min - 1} pts` : '+'}</div>
-                </div>
-                {puntos >= lv.min ? (
-                  level.label === lv.label ? (
-                    <span style={{ fontSize: 11, fontWeight: 700, color: lv.color, background: lv.bg, padding: '3px 10px', borderRadius: 100 }}>Actual</span>
-                  ) : (
-                    <span style={{ fontSize: 16 }}>✅</span>
-                  )
-                ) : (
-                  <span style={{ fontSize: 11, color: '#7B8499' }}>Bloqueado</span>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* Historial de puntos */}
-          <div style={s.card}>
-            <div style={s.cardLabel}>📊 Últimas ganancias</div>
-            {HISTORY.map((h, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 0', borderBottom: i < HISTORY.length - 1 ? '1px solid #EEF0F4' : 'none' }}>
-                <div style={{ fontSize: 20 }}>{h.emoji}</div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 13, fontWeight: 500, color: '#111827' }}>{h.texto}</div>
-                  <div style={{ fontSize: 11, color: '#7B8499' }}>{h.hora}</div>
-                </div>
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#0E8A7A' }}>+{h.pts}</span>
-              </div>
-            ))}
-          </div>
-
-          {/* Puntos por acción */}
-          <div style={s.card}>
-            <div style={s.cardLabel}>💡 ¿Cómo ganar puntos?</div>
-            {[
-              { emoji: '💊', accion: 'Marcar indicación cumplida', pts: '+10' },
-              { emoji: '📅', accion: 'Completar diario de salud', pts: '+15' },
-              { emoji: '🧪', accion: 'Subir examen de laboratorio', pts: '+25' },
-              { emoji: '⚡', accion: 'Completar minihábito del día', pts: '+5' },
-              { emoji: '🔥', accion: 'Racha de 7 días', pts: '+50' },
-              { emoji: '🏆', accion: 'Completar reto semanal', pts: '+100' },
-            ].map((item, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: i < 5 ? '1px solid #EEF0F4' : 'none' }}>
-                <span style={{ fontSize: 18 }}>{item.emoji}</span>
-                <span style={{ flex: 1, fontSize: 12, color: '#3D4457' }}>{item.accion}</span>
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#0E8A7A' }}>{item.pts}</span>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -236,7 +262,7 @@ const s: Record<string, React.CSSProperties> = {
   h1: { fontFamily: "'Lora',serif", fontSize: 26, fontWeight: 600, color: '#1B3A6B' },
   sub: { fontSize: 13, color: '#7B8499', marginTop: 4 },
   twoCol: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'start' },
-  levelCard: { borderRadius: 18, padding: '24px', marginBottom: 16, color: '#fff' },
+  levelCard: { borderRadius: 18, padding: '24px', marginBottom: 16 },
   card: { background: '#fff', borderRadius: 16, padding: '18px 20px', marginBottom: 16, boxShadow: '0 1px 6px rgba(27,58,107,0.07)' },
   cardLabel: { fontSize: 11, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: .5, color: '#7B8499', marginBottom: 12 },
 };
