@@ -1,6 +1,7 @@
 'use client';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const NAV = [
   { href: '/patient',         icon: '🏠', label: 'Inicio' },
@@ -17,7 +18,6 @@ const BOTTOM = [
   { href: '/patient/settings', icon: '⚙️', label: 'Configuración' },
 ];
 
-// Gamification levels
 const LEVELS = [
   { min: 0,    max: 99,   label: 'Semilla',  emoji: '🌰', color: '#92400E' },
   { min: 100,  max: 299,  label: 'Brote',    emoji: '🌱', color: '#16A34A' },
@@ -40,9 +40,16 @@ export default function Sidebar({ nombre = 'Paciente', puntos = 120 }: { nombre?
     <>
       {/* Desktop sidebar */}
       <aside style={s.sidebar}>
-        {/* Brand */}
+        {/* Brand — logo imagen */}
         <div style={s.brand}>
-          <div style={s.brandName}>Nexo<span style={{ color: '#7DD3C8' }}>Doc</span></div>
+          <Image
+            src="/logo_fondo_azul.png"
+            alt="MiNexoSalud"
+            width={160}
+            height={48}
+            style={{ objectFit: 'contain', display: 'block' }}
+            priority
+          />
         </div>
 
         {/* User + level */}
@@ -63,7 +70,7 @@ export default function Sidebar({ nombre = 'Paciente', puntos = 120 }: { nombre?
             {nextLevel && <span>{nextLevel.label}</span>}
           </div>
           <div style={{ height: 4, background: 'rgba(255,255,255,0.1)', borderRadius: 4 }}>
-            <div style={{ height: '100%', width: `${progress}%`, background: '#7DD3C8', borderRadius: 4, transition: 'width .4s' }} />
+            <div style={{ height: '100%', width: `${progress}%`, background: '#99DDC7', borderRadius: 4, transition: 'width .4s' }} />
           </div>
           <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 3, textAlign: 'right' as const }}>
             {nextLevel ? `${nextLevel.min - puntos} pts para ${nextLevel.label}` : '¡Nivel máximo!'}
@@ -82,7 +89,7 @@ export default function Sidebar({ nombre = 'Paciente', puntos = 120 }: { nombre?
                   <span style={{ fontSize: 16 }}>{item.icon}</span>
                   <span style={{ fontSize: 13, fontWeight: active ? 600 : 400 }}>{item.label}</span>
                   {item.href === '/patient/habits' && (
-                    <span style={{ marginLeft: 'auto', background: '#0E8A7A', color: '#fff', fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 100 }}>HOY</span>
+                    <span style={{ marginLeft: 'auto', background: '#99DDC7', color: '#1B3A6B', fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 100 }}>HOY</span>
                   )}
                 </div>
               </Link>
@@ -99,8 +106,8 @@ export default function Sidebar({ nombre = 'Paciente', puntos = 120 }: { nombre?
                   ...s.navItem,
                   ...(active ? s.navActive : {}),
                   ...('highlight' in item && item.highlight ? {
-                    background: 'rgba(125,211,200,0.15)',
-                    border: '1px solid rgba(125,211,200,0.3)',
+                    background: 'rgba(153,221,199,0.15)',
+                    border: '1px solid rgba(153,221,199,0.3)',
                     marginBottom: 4,
                   } : {}),
                 }}>
@@ -108,7 +115,7 @@ export default function Sidebar({ nombre = 'Paciente', puntos = 120 }: { nombre?
                   <span style={{
                     fontSize: 13,
                     fontWeight: active ? 600 : ('highlight' in item && item.highlight ? 600 : 400),
-                    color: 'highlight' in item && item.highlight ? '#7DD3C8' : undefined,
+                    color: 'highlight' in item && item.highlight ? '#99DDC7' : undefined,
                   }}>{item.label}</span>
                 </div>
               </Link>
@@ -122,7 +129,7 @@ export default function Sidebar({ nombre = 'Paciente', puntos = 120 }: { nombre?
 
         {/* Footer */}
         <div style={{ padding: '16px 20px', fontSize: 10, color: 'rgba(255,255,255,0.25)', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-          NexoDoc · v2.0
+          MiNexoSalud · v2.0
         </div>
       </aside>
 
@@ -133,7 +140,7 @@ export default function Sidebar({ nombre = 'Paciente', puntos = 120 }: { nombre?
           return (
             <Link key={item.href} href={item.href} style={{ textDecoration: 'none', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '8px 0' }}>
               <span style={{ fontSize: 20, opacity: active ? 1 : 0.5 }}>{item.icon}</span>
-              <span style={{ fontSize: 9, fontWeight: 600, color: active ? '#0E8A7A' : '#7B8499' }}>{item.label.split(' ')[0]}</span>
+              <span style={{ fontSize: 9, fontWeight: 600, color: active ? '#3366CC' : '#7B8499' }}>{item.label.split(' ')[0]}</span>
             </Link>
           );
         })}
@@ -143,9 +150,8 @@ export default function Sidebar({ nombre = 'Paciente', puntos = 120 }: { nombre?
 }
 
 const s: Record<string, React.CSSProperties> = {
-  sidebar: { width: 240, minHeight: '100vh', background: '#1B3A6B', display: 'flex', flexDirection: 'column', position: 'fixed', top: 0, left: 0, zIndex: 50, fontFamily: "'Sora',sans-serif" },
-  brand: { padding: '24px 20px 16px', borderBottom: '1px solid rgba(255,255,255,0.08)' },
-  brandName: { fontFamily: "'Lora',serif", fontSize: 20, fontWeight: 700, color: '#FFFFFF' },
+  sidebar: { width: 240, minHeight: '100vh', background: '#3366CC', display: 'flex', flexDirection: 'column', position: 'fixed', top: 0, left: 0, zIndex: 50, fontFamily: "'Sora',sans-serif" },
+  brand: { padding: '20px 20px 16px', borderBottom: '1px solid rgba(255,255,255,0.08)' },
   userBox: { display: 'flex', alignItems: 'center', gap: 10, padding: '14px 16px 8px' },
   avatar: { width: 38, height: 38, borderRadius: '50%', background: 'rgba(255,255,255,0.15)', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, flexShrink: 0 },
   levelBar: { padding: '0 16px 14px', borderBottom: '1px solid rgba(255,255,255,0.08)' },
