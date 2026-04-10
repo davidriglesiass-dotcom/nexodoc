@@ -70,8 +70,8 @@ export default function DoctorPage() {
         }
       `}</style>
       <div className="doctor-page" style={s.page}>
-        <h1 style={s.h1}>🩺 Mi Doctor</h1>
-        <p style={s.sub}>Tratamiento activo y comunicación con tu especialista</p>
+        <h1 style={s.h1}>🩺 Mis Doctores</h1>
+        <p style={s.sub}>Tratamiento activo y comunicación con tus especialistas</p>
 
         {DOCTORS.length > 1 && (
           <div style={s.docTabs}>
