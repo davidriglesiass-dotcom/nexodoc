@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Sidebar from '@/components/patient/Sidebar';
 
 export const metadata: Metadata = {
-  title: 'NexoDoc — Tu portal de salud',
+  title: 'MiNexoSalud — Tu portal de salud',
   description: 'Conecta con tu médico, sigue tu tratamiento y cuida tu bienestar.',
 };
 
@@ -10,7 +10,7 @@ export default function PatientLayout({ children }: { children: React.ReactNode 
   return (
     <html lang="es">
       <head>
-        <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
         <style>{`
           * { box-sizing: border-box; margin: 0; padding: 0; }
           body { font-family: 'Sora', sans-serif; background: #F8F9FB; }
