@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 const NAV = [
   { href: '/patient',         icon: '🏠', label: 'Inicio',       short: 'Inicio' },
   { href: '/patient/chat',    icon: '💬', label: 'Dani IA',      short: 'Dani' },
-  { href: '/patient/doctor',  icon: '🩺', label: 'Mis Doctores', short: 'Doctor' },
+  { href: '/patient/doctor',  icon: '🥼', label: 'Mis Doctores', short: 'Doctores' },
   { href: '/patient/diary',   icon: '📅', label: 'Mi Diario',    short: 'Diario' },
   { href: '/patient/exams',   icon: '🧪', label: 'Mis Exámenes', short: 'Exámenes' },
   { href: '/patient/habits',  icon: '🌱', label: 'Minihábitо',   short: 'Hábito' },
