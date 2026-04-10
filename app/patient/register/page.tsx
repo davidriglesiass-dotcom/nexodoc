@@ -19,18 +19,13 @@ function RegisterForm() {
     if (password !== confirm) { setError('Las contraseñas no coinciden.'); return; }
     if (password.length < 8) { setError('La contraseña debe tener al menos 8 caracteres.'); return; }
     setLoading(true);
-    try {
-      const res = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nombre, email, password, doctor_token: doctorToken }),
-      });
-      const data = await res.json();
-      if (!res.ok) { setError(data.message ?? 'Error al registrarse'); return; }
-      localStorage.setItem('mdl_token', data.token);
-      router.push('/patient');
-    } catch { setError('Error de conexión.'); }
-    finally { setLoading(false); }
+
+    // Modo demo — guarda en localStorage y redirige
+    const user = { nombre, email, doctor_token: doctorToken, plan: 'free', puntos: 0, onboarding: false };
+    localStorage.setItem('mnx_user', JSON.stringify(user));
+    localStorage.setItem('mdl_token', 'demo_token');
+    router.push('/patient');
+    // René reemplaza el bloque anterior con la llamada a /api/auth/register
   }
 
   const mismatch = confirm.length > 0 && confirm !== password;
@@ -38,28 +33,42 @@ function RegisterForm() {
   return (
     <div style={s.bg}>
       <div style={s.card}>
-        <div style={s.logo}>Nexo<span style={{ color: '#7DD3C8' }}>Doc</span></div>
+        <img src="/logo_sidebar.png" alt="MiNexoSalud" style={{ width: 180, marginBottom: 16 }} />
         <p style={s.sub}>Crea tu cuenta y empieza a cuidarte</p>
-        {doctorToken && <div style={s.docBadge}>🩺 Te registras con tu médico de ConectoSalud</div>}
-        <button style={s.google} onClick={() => alert('Google OAuth — próximamente')}>
+
+        {doctorToken && (
+          <div style={s.docBadge}>🩺 Te registras con tu médico de MiNexoSalud</div>
+        )}
+
+        <button style={s.google} onClick={() => alert('Google — próximamente')}>
           <GoogleSVG /> Registrarse con Google
         </button>
         <div style={s.divider}>o</div>
+
         <form onSubmit={handleRegister} style={{ width: '100%' }}>
           {error && <div style={s.err}>{error}</div>}
-          <Field label="Nombre completo *"><input style={s.inp} type="text" value={nombre} onChange={e => setNombre(e.target.value)} placeholder="María González" required /></Field>
-          <Field label="Correo electrónico *"><input style={s.inp} type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="nombre@ejemplo.com" required /></Field>
-          <Field label="Contraseña *"><input style={s.inp} type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Mínimo 8 caracteres" required /></Field>
+          <Field label="Nombre completo *">
+            <input style={s.inp} type="text" value={nombre} onChange={e => setNombre(e.target.value)} placeholder="María González" required />
+          </Field>
+          <Field label="Correo electrónico *">
+            <input style={s.inp} type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="nombre@ejemplo.com" required />
+          </Field>
+          <Field label="Contraseña *">
+            <input style={s.inp} type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Mínimo 8 caracteres" required />
+          </Field>
           <Field label="Confirmar contraseña *">
             <input style={{ ...s.inp, borderColor: mismatch ? '#C0392B' : '#EEF0F4' }} type="password" value={confirm} onChange={e => setConfirm(e.target.value)} placeholder="Repite tu contraseña" required />
             {mismatch && <span style={{ fontSize: 11, color: '#C0392B', marginTop: 4, display: 'block' }}>Las contraseñas no coinciden</span>}
           </Field>
           <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12, color: '#7B8499', marginBottom: 16, cursor: 'pointer' }}>
             <input type="checkbox" required style={{ marginTop: 2 }} />
-            Acepto los términos y la política de privacidad de ConectoSalud
+            Acepto los <a href="/privacidad" style={{ color: '#0E8A7A' }}>términos y política de privacidad</a> de MiNexoSalud
           </label>
-          <button type="submit" style={s.submit} disabled={loading}>{loading ? 'Creando cuenta...' : 'Crear cuenta'}</button>
+          <button type="submit" style={s.submit} disabled={loading}>
+            {loading ? 'Creando cuenta...' : 'Crear cuenta gratis'}
+          </button>
         </form>
+
         <p style={s.foot}>¿Ya tienes cuenta? <Link href="/patient/login" style={{ color: '#0E8A7A', fontWeight: 600 }}>Inicia sesión</Link></p>
       </div>
     </div>
@@ -89,11 +98,10 @@ export default function RegisterPage() {
 const s: Record<string, React.CSSProperties> = {
   bg: { minHeight: '100vh', background: '#EBF1FB', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, fontFamily: "'Sora',sans-serif" },
   card: { background: '#fff', borderRadius: 20, padding: '40px 36px', width: '100%', maxWidth: 420, boxShadow: '0 8px 40px rgba(27,58,107,0.12)', display: 'flex', flexDirection: 'column', alignItems: 'center' },
-  logo: { fontFamily: "'Lora',serif", fontSize: 28, fontWeight: 700, color: '#1B3A6B', marginBottom: 6 },
-  sub: { fontSize: 13, color: '#7B8499', marginBottom: 20, textAlign: 'center' },
-  docBadge: { background: '#E0F5F2', border: '1px solid #0E8A7A', borderRadius: 10, padding: '10px 16px', fontSize: 13, color: '#0E8A7A', fontWeight: 600, width: '100%', marginBottom: 16, textAlign: 'center' },
+  sub: { fontSize: 13, color: '#7B8499', marginBottom: 20, textAlign: 'center' as const },
+  docBadge: { background: '#E0F5F2', border: '1px solid #0E8A7A', borderRadius: 10, padding: '10px 16px', fontSize: 13, color: '#0E8A7A', fontWeight: 600, width: '100%', marginBottom: 16, textAlign: 'center' as const },
   google: { width: '100%', padding: '12px 0', border: '1.5px solid #D5DAE4', borderRadius: 10, background: '#fff', fontSize: 14, fontWeight: 600, color: '#3D4457', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, fontFamily: "'Sora',sans-serif" },
-  divider: { width: '100%', textAlign: 'center', margin: '0 0 16px', color: '#7B8499', fontSize: 12 },
+  divider: { width: '100%', textAlign: 'center' as const, margin: '0 0 16px', color: '#7B8499', fontSize: 12 },
   inp: { width: '100%', padding: '12px 14px', border: '2px solid #EEF0F4', borderRadius: 10, fontSize: 14, fontFamily: "'Sora',sans-serif", color: '#111827', background: '#F8F9FB', outline: 'none', boxSizing: 'border-box' as const },
   submit: { width: '100%', padding: '13px 0', background: '#1B3A6B', color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "'Sora',sans-serif" },
   err: { background: '#FDEAEA', border: '1px solid #C0392B', borderRadius: 8, padding: '10px 14px', fontSize: 13, color: '#C0392B', marginBottom: 14 },
