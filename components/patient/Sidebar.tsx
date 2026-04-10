@@ -6,7 +6,7 @@ import Image from 'next/image';
 const NAV = [
   { href: '/patient',         icon: '🏠', label: 'Inicio' },
   { href: '/patient/chat',    icon: '💬', label: 'Dani IA' },
-  { href: '/patient/doctor',  icon: '🥼', label: 'Mi Doctor' },
+  { href: '/patient/doctor',  icon: '🥼', label: 'Mis Doctores' },
   { href: '/patient/diary',   icon: '📅', label: 'Mi Diario' },
   { href: '/patient/exams',   icon: '🧪', label: 'Mis Exámenes' },
   { href: '/patient/habits',  icon: '🌱', label: 'Minihábitо' },
