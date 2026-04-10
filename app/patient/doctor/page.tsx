@@ -48,7 +48,6 @@ export default function DoctorPage() {
     if (!sintoma.trim()) return;
     setLoading(true);
     setShowDani(false);
-    // Simular Dani — René conecta con /api/ai/chat
     setTimeout(() => {
       setDaniResp(getDaniResponse(sintoma));
       setShowDani(true);
@@ -60,134 +59,135 @@ export default function DoctorPage() {
     setSentToDoctor(true);
     setSintoma('');
     setShowDani(false);
-    // René: POST /api/patient/report-symptom { doctor_id: activeDoc, contenido: sintoma }
   }
 
   return (
-    <div style={s.page}>
-      <h1 style={s.h1}>🩺 Mi Doctor</h1>
-      <p style={s.sub}>Tratamiento activo y comunicación con tu especialista</p>
+    <>
+      <style>{`
+        @media (max-width: 768px) {
+          .doctor-page { padding: 20px 16px !important; }
+          .doctor-two-col { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
+      <div className="doctor-page" style={s.page}>
+        <h1 style={s.h1}>🩺 Mi Doctor</h1>
+        <p style={s.sub}>Tratamiento activo y comunicación con tu especialista</p>
 
-      {/* Selector de doctores */}
-      {DOCTORS.length > 1 && (
-        <div style={s.docTabs}>
-          {DOCTORS.map(d => (
-            <button key={d.id} onClick={() => setActiveDoc(d.id)}
-              style={{ ...s.docTab, ...(activeDoc === d.id ? s.docTabActive : {}) }}>
-              <div style={{ ...s.docAv, width: 28, height: 28, fontSize: 11 }}>{d.initials}</div>
-              Dr. {d.apellido}
-            </button>
-          ))}
-        </div>
-      )}
-
-      <div style={s.twoCol}>
-        {/* Columna izquierda */}
-        <div>
-          {/* Doctor card */}
-          <div style={s.docCard}>
-            <div style={s.docAv}>{doc.initials}</div>
-            <div>
-              <div style={{ fontFamily: "'Lora',serif", fontSize: 18, fontWeight: 600, color: '#1B3A6B' }}>Dr. {doc.nombre} {doc.apellido}</div>
-              <div style={{ fontSize: 12, color: '#7B8499' }}>{doc.especialidad}</div>
-              <div style={{ fontSize: 12, color: '#7B8499' }}>{doc.clinica}</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 6 }}>
-                <div style={{ width: 6, height: 6, borderRadius: '50%', background: doc.online ? '#16A34A' : '#D5DAE4' }} />
-                <span style={{ fontSize: 11, color: doc.online ? '#16A34A' : '#7B8499', fontWeight: 600 }}>
-                  {doc.online ? 'En línea' : 'No disponible'}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Tratamiento */}
-          <div style={s.card}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-              <div style={s.cardLabel}>💊 Tratamiento activo</div>
-              <span style={{ fontSize: 12, fontWeight: 700, color: '#0E8A7A' }}>{done}/{treatment.length} hoy</span>
-            </div>
-            {/* Progress */}
-            <div style={{ height: 6, background: '#EEF0F4', borderRadius: 6, marginBottom: 14, overflow: 'hidden' }}>
-              <div style={{ height: '100%', width: `${(done / treatment.length) * 100}%`, background: 'linear-gradient(to right,#0E8A7A,#16A34A)', borderRadius: 6, transition: 'width .3s' }} />
-            </div>
-            {treatment.map(t => (
-              <div key={t.id} style={{ ...s.treatItem, background: t.cumplida ? '#E0F5F2' : '#fff' }}>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 600, fontSize: 14, color: t.cumplida ? '#7B8499' : '#111827', textDecoration: t.cumplida ? 'line-through' : 'none' }}>{t.desc}</div>
-                  <div style={{ fontSize: 11, color: '#7B8499', marginTop: 2 }}>
-                    {t.dosis !== '—' && `${t.dosis}`}{t.hora && ` · ${t.hora}`}{t.notas && ` · ${t.notas}`}
-                  </div>
-                </div>
-                {t.cumplida
-                  ? <span style={s.doneBadge}>✓ Listo</span>
-                  : <button style={s.markBtn} onClick={() => mark(t.id)}>Marcar</button>}
-              </div>
+        {DOCTORS.length > 1 && (
+          <div style={s.docTabs}>
+            {DOCTORS.map(d => (
+              <button key={d.id} onClick={() => setActiveDoc(d.id)}
+                style={{ ...s.docTab, ...(activeDoc === d.id ? s.docTabActive : {}) }}>
+                <div style={{ ...s.docAv, width: 28, height: 28, fontSize: 11 }}>{d.initials}</div>
+                Dr. {d.apellido}
+              </button>
             ))}
           </div>
-        </div>
+        )}
 
-        {/* Columna derecha — síntomas + Dani */}
-        <div>
-          <div style={s.card}>
-            <div style={s.cardLabel}>🤒 Reportar síntoma o reacción</div>
-            <p style={{ fontSize: 13, color: '#7B8499', marginBottom: 14, lineHeight: 1.5 }}>
-              Describe cómo te sientes. <b style={{ color: '#0E8A7A' }}>Dani</b> te dará un primer apoyo y, si es necesario, notificará a tu doctor.
-            </p>
-
-            <textarea
-              style={s.ta}
-              placeholder="Ej: Tengo dolor de cabeza desde esta mañana, también siento náuseas..."
-              value={sintoma}
-              onChange={e => setSintoma(e.target.value)}
-              rows={4}
-            />
-
-            <button onClick={askDani} disabled={!sintoma.trim() || loading}
-              style={{ ...s.markBtn, width: '100%', padding: '12px', marginTop: 10, background: sintoma.trim() ? 'linear-gradient(135deg,#0E8A7A,#16A34A)' : '#D5DAE4', borderRadius: 10, fontSize: 14 }}>
-              {loading ? '✨ Dani está pensando...' : '✨ Consultar con Dani primero'}
-            </button>
-
-            {/* Respuesta de Dani */}
-            {showDani && daniResp && (
-              <div style={s.daniBox}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                  <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#0E8A7A', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>✨</div>
-                  <b style={{ fontSize: 13, color: '#0E8A7A' }}>Dani</b>
-                </div>
-                <p style={{ fontSize: 14, color: '#111827', lineHeight: 1.6, marginBottom: 16 }}>{daniResp}</p>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' as const }}>
-                  <button onClick={sendToDoctor}
-                    style={{ padding: '10px 16px', background: '#1B3A6B', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "'Sora',sans-serif" }}>
-                    📤 Enviar al Dr. {doc.apellido}
-                  </button>
-                  <button onClick={() => setShowDani(false)}
-                    style={{ padding: '10px 16px', background: '#EEF0F4', color: '#3D4457', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Sora',sans-serif" }}>
-                    Está bien, no es urgente
-                  </button>
+        <div className="doctor-two-col" style={s.twoCol}>
+          {/* Columna izquierda */}
+          <div>
+            <div style={s.docCard}>
+              <div style={s.docAv}>{doc.initials}</div>
+              <div>
+                <div style={{ fontFamily: "'Lora',serif", fontSize: 18, fontWeight: 600, color: '#1B3A6B' }}>Dr. {doc.nombre} {doc.apellido}</div>
+                <div style={{ fontSize: 12, color: '#7B8499' }}>{doc.especialidad}</div>
+                <div style={{ fontSize: 12, color: '#7B8499' }}>{doc.clinica}</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 6 }}>
+                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: doc.online ? '#16A34A' : '#D5DAE4' }} />
+                  <span style={{ fontSize: 11, color: doc.online ? '#16A34A' : '#7B8499', fontWeight: 600 }}>
+                    {doc.online ? 'En línea' : 'No disponible'}
+                  </span>
                 </div>
               </div>
-            )}
+            </div>
 
-            {sentToDoctor && (
-              <div style={{ background: '#DCFCE7', border: '1px solid #16A34A', borderRadius: 10, padding: '12px 16px', marginTop: 12, fontSize: 13, fontWeight: 600, color: '#166534', textAlign: 'center' as const }}>
-                ✓ El Dr. {doc.apellido} recibió tu reporte. Te contactará pronto.
+            <div style={s.card}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+                <div style={s.cardLabel}>💊 Tratamiento activo</div>
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#0E8A7A' }}>{done}/{treatment.length} hoy</span>
               </div>
-            )}
+              <div style={{ height: 6, background: '#EEF0F4', borderRadius: 6, marginBottom: 14, overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${(done / treatment.length) * 100}%`, background: 'linear-gradient(to right,#0E8A7A,#16A34A)', borderRadius: 6, transition: 'width .3s' }} />
+              </div>
+              {treatment.map(t => (
+                <div key={t.id} style={{ ...s.treatItem, background: t.cumplida ? '#E0F5F2' : '#fff' }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 600, fontSize: 14, color: t.cumplida ? '#7B8499' : '#111827', textDecoration: t.cumplida ? 'line-through' : 'none' }}>{t.desc}</div>
+                    <div style={{ fontSize: 11, color: '#7B8499', marginTop: 2 }}>
+                      {t.dosis !== '—' && `${t.dosis}`}{t.hora && ` · ${t.hora}`}{t.notas && ` · ${t.notas}`}
+                    </div>
+                  </div>
+                  {t.cumplida
+                    ? <span style={s.doneBadge}>✓ Listo</span>
+                    : <button style={s.markBtn} onClick={() => mark(t.id)}>Marcar</button>}
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Próxima cita */}
-          <div style={{ ...s.card, background: 'linear-gradient(135deg,#1B3A6B,#2D5FA6)', color: '#fff' }}>
-            <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: .5, opacity: .7, marginBottom: 8 }}>Próxima cita</div>
-            <div style={{ fontFamily: "'Lora',serif", fontSize: 18, fontWeight: 600, marginBottom: 4 }}>Miércoles 9 de Abril</div>
-            <div style={{ fontSize: 13, opacity: .8 }}>9:00 AM · 45 min · Seguimiento</div>
-            <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
-              <button style={{ padding: '8px 16px', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 8, color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: "'Sora',sans-serif" }}>Confirmar</button>
-              <button style={{ padding: '8px 16px', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 8, color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: "'Sora',sans-serif" }}>Reagendar</button>
+          {/* Columna derecha */}
+          <div>
+            <div style={s.card}>
+              <div style={s.cardLabel}>🤒 Reportar síntoma o reacción</div>
+              <p style={{ fontSize: 13, color: '#7B8499', marginBottom: 14, lineHeight: 1.5 }}>
+                Describe cómo te sientes. <b style={{ color: '#0E8A7A' }}>Dani</b> te dará un primer apoyo y, si es necesario, notificará a tu doctor.
+              </p>
+
+              <textarea
+                style={s.ta}
+                placeholder="Ej: Tengo dolor de cabeza desde esta mañana, también siento náuseas..."
+                value={sintoma}
+                onChange={e => setSintoma(e.target.value)}
+                rows={4}
+              />
+
+              <button onClick={askDani} disabled={!sintoma.trim() || loading}
+                style={{ ...s.markBtn, width: '100%', padding: '12px', marginTop: 10, background: sintoma.trim() ? 'linear-gradient(135deg,#0E8A7A,#16A34A)' : '#D5DAE4', borderRadius: 10, fontSize: 14 }}>
+                {loading ? '✨ Dani está pensando...' : '✨ Consultar con Dani primero'}
+              </button>
+
+              {showDani && daniResp && (
+                <div style={s.daniBox}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                    <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#0E8A7A', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>✨</div>
+                    <b style={{ fontSize: 13, color: '#0E8A7A' }}>Dani</b>
+                  </div>
+                  <p style={{ fontSize: 14, color: '#111827', lineHeight: 1.6, marginBottom: 16 }}>{daniResp}</p>
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' as const }}>
+                    <button onClick={sendToDoctor}
+                      style={{ padding: '10px 16px', background: '#1B3A6B', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "'Sora',sans-serif" }}>
+                      📤 Enviar al Dr. {doc.apellido}
+                    </button>
+                    <button onClick={() => setShowDani(false)}
+                      style={{ padding: '10px 16px', background: '#EEF0F4', color: '#3D4457', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Sora',sans-serif" }}>
+                      Está bien, no es urgente
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {sentToDoctor && (
+                <div style={{ background: '#DCFCE7', border: '1px solid #16A34A', borderRadius: 10, padding: '12px 16px', marginTop: 12, fontSize: 13, fontWeight: 600, color: '#166534', textAlign: 'center' as const }}>
+                  ✓ El Dr. {doc.apellido} recibió tu reporte. Te contactará pronto.
+                </div>
+              )}
+            </div>
+
+            <div style={{ ...s.card, background: 'linear-gradient(135deg,#1B3A6B,#2D5FA6)', color: '#fff' }}>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: .5, opacity: .7, marginBottom: 8 }}>Próxima cita</div>
+              <div style={{ fontFamily: "'Lora',serif", fontSize: 18, fontWeight: 600, marginBottom: 4 }}>Miércoles 9 de Abril</div>
+              <div style={{ fontSize: 13, opacity: .8 }}>9:00 AM · 45 min · Seguimiento</div>
+              <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
+                <button style={{ padding: '8px 16px', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 8, color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: "'Sora',sans-serif" }}>Confirmar</button>
+                <button style={{ padding: '8px 16px', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 8, color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: "'Sora',sans-serif" }}>Reagendar</button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
