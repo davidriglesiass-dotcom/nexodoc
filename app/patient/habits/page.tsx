@@ -22,11 +22,11 @@ const WEEK_CHALLENGE = {
 };
 
 const LEVELS = [
-  { min: 0,    label: 'Semilla',  emoji: '🌰', color: '#92400E', bg: '#FEF3C7' },
-  { min: 100,  label: 'Brote',    emoji: '🌱', color: '#16A34A', bg: '#DCFCE7' },
-  { min: 300,  label: 'Planta',   emoji: '🪴', color: '#0E8A7A', bg: '#E0F5F2' },
-  { min: 700,  label: 'Árbol',    emoji: '🌳', color: '#1B3A6B', bg: '#EBF1FB' },
-  { min: 1500, label: 'Bosque',   emoji: '🌲', color: '#065F52', bg: '#D1FAE5' },
+  { min: 0,    label: 'Aprendiz',     emoji: '📖', color: '#92400E', bg: '#FEF3C7' },
+  { min: 100,  label: 'Consciente',   emoji: '👁️', color: '#16A34A', bg: '#DCFCE7' },
+  { min: 300,  label: 'Activo',       emoji: '⚡', color: '#0E8A7A', bg: '#E0F5F2' },
+  { min: 700,  label: 'Comprometido', emoji: '🎯', color: '#1B3A6B', bg: '#EBF1FB' },
+  { min: 1500, label: 'Guardián',     emoji: '🛡️', color: '#065F52', bg: '#D1FAE5' },
 ];
 
 const HISTORY = [
@@ -63,8 +63,8 @@ export default function HabitsPage() {
   return (
     <div style={s.page}>
       <div style={{ marginBottom: 24 }}>
-        <h1 style={s.h1}>🌱 Minihábitо & Gamificación</h1>
-        <p style={s.sub}>Pequeñas acciones que construyen grandes cambios</p>
+        <h1 style={s.h1}>⚡ Minihábitos</h1>
+        <p style={s.sub}>Pequeñas acciones para tomar control de tu salud</p>
       </div>
 
       <div style={s.twoCol}>
@@ -75,9 +75,10 @@ export default function HabitsPage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
               <div style={{ fontSize: 52 }}>{level.emoji}</div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'rgba(255,255,255,0.6)', marginBottom: 4 }}>Tu nivel</div>
+                <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: 1, color: 'rgba(255,255,255,0.6)', marginBottom: 4 }}>Tu nivel</div>
                 <div style={{ fontFamily: "'Lora',serif", fontSize: 28, fontWeight: 600, color: '#fff' }}>{level.label}</div>
-                <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.8)', marginTop: 2 }}>{puntos} puntos totales</div>
+                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', marginTop: 2, fontStyle: 'italic' }}>Dueño de tu salud</div>
+                <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.8)', marginTop: 4 }}>{puntos} puntos totales</div>
               </div>
             </div>
             {nextLevel && (
@@ -87,7 +88,7 @@ export default function HabitsPage() {
                   <span>{progress}%</span>
                 </div>
                 <div style={{ height: 6, background: 'rgba(255,255,255,0.2)', borderRadius: 6 }}>
-                  <div style={{ height: '100%', width: `${progress}%`, background: '#7DD3C8', borderRadius: 6, transition: 'width .4s' }} />
+                  <div style={{ height: '100%', width: `${progress}%`, background: '#99DDC7', borderRadius: 6, transition: 'width .4s' }} />
                 </div>
                 <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>
                   {nextLevel.min - puntos} pts para subir de nivel
@@ -98,7 +99,7 @@ export default function HabitsPage() {
 
           {/* Minihábitо del día */}
           <div style={s.card}>
-            <div style={s.cardLabel}>✨ Minihábitо de hoy</div>
+            <div style={s.cardLabel}>✨ Minihábito de hoy</div>
             {habitDone ? (
               <div style={{ textAlign: 'center' as const, padding: '20px 0' }}>
                 <div style={{ fontSize: 48, marginBottom: 12 }}>🎉</div>
@@ -148,7 +149,7 @@ export default function HabitsPage() {
         <div>
           {/* Todos los niveles */}
           <div style={s.card}>
-            <div style={s.cardLabel}>🌿 Todos los niveles</div>
+            <div style={s.cardLabel}>🛡️ Todos los niveles</div>
             {LEVELS.map((lv, i) => (
               <div key={lv.label} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: i < LEVELS.length - 1 ? '1px solid #EEF0F4' : 'none', opacity: puntos >= lv.min ? 1 : 0.4 }}>
                 <div style={{ fontSize: 28 }}>{lv.emoji}</div>
@@ -191,7 +192,7 @@ export default function HabitsPage() {
               { emoji: '💊', accion: 'Marcar indicación cumplida', pts: '+10' },
               { emoji: '📅', accion: 'Completar diario de salud', pts: '+15' },
               { emoji: '🧪', accion: 'Subir examen de laboratorio', pts: '+25' },
-              { emoji: '🌱', accion: 'Completar minihábitо del día', pts: '+5' },
+              { emoji: '⚡', accion: 'Completar minihábito del día', pts: '+5' },
               { emoji: '🔥', accion: 'Racha de 7 días', pts: '+50' },
               { emoji: '🏆', accion: 'Completar reto semanal', pts: '+100' },
             ].map((item, i) => (
