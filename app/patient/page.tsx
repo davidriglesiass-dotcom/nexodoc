@@ -40,7 +40,7 @@ export default function PatientHome() {
         <div style={s.puntosBox}>
           <div style={{ fontSize: 10, color: '#7B8499', fontWeight: 700, textTransform: 'uppercase', letterSpacing: .5 }}>Puntos</div>
           <div style={{ fontSize: 22, fontWeight: 700, color: '#1B3A6B' }}>{MOCK_PUNTOS}</div>
-          <div style={{ fontSize: 11, color: '#0E8A7A' }}>🌱 Brote</div>
+          <div style={{ fontSize: 11, color: '#0E8A7A' }}>👁️ Consciente</div>
         </div>
       </div>
 
