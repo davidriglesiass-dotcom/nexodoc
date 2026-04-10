@@ -19,11 +19,11 @@ const BOTTOM = [
 ];
 
 const LEVELS = [
-  { min: 0,    max: 99,   label: 'Semilla',  emoji: '🌰', color: '#92400E' },
-  { min: 100,  max: 299,  label: 'Brote',    emoji: '🌱', color: '#16A34A' },
-  { min: 300,  max: 699,  label: 'Planta',   emoji: '🪴', color: '#0E8A7A' },
-  { min: 700,  max: 1499, label: 'Árbol',    emoji: '🌳', color: '#1B3A6B' },
-  { min: 1500, max: 9999, label: 'Bosque',   emoji: '🌲', color: '#065F52' },
+  { min: 0,    max: 99,   label: 'Aprendiz',     emoji: '📖', color: '#92400E' },
+  { min: 100,  max: 299,  label: 'Consciente',   emoji: '👁️', color: '#16A34A' },
+  { min: 300,  max: 699,  label: 'Activo',       emoji: '⚡', color: '#0E8A7A' },
+  { min: 700,  max: 1499, label: 'Comprometido', emoji: '🎯', color: '#1B3A6B' },
+  { min: 1500, max: 9999, label: 'Guardián',     emoji: '🛡️', color: '#065F52' },
 ];
 
 function getLevel(pts: number) {
