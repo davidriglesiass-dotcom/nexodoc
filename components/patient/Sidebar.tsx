@@ -5,12 +5,12 @@ import Image from 'next/image';
 import { useState, useEffect } from 'react';
 
 const NAV = [
-  { href: '/patient',         icon: '🏠', label: 'Inicio' },
-  { href: '/patient/chat',    icon: '💬', label: 'Dani IA' },
-  { href: '/patient/doctor',  icon: '🥼', label: 'Mis Doctores' },
-  { href: '/patient/diary',   icon: '📅', label: 'Mi Diario' },
-  { href: '/patient/exams',   icon: '🧪', label: 'Mis Exámenes' },
-  { href: '/patient/habits',  icon: '🌱', label: 'Minihábitо' },
+  { href: '/patient',         icon: '🏠', label: 'Inicio',       short: 'Inicio' },
+  { href: '/patient/chat',    icon: '💬', label: 'Dani IA',      short: 'Dani' },
+  { href: '/patient/doctor',  icon: '🩺', label: 'Mis Doctores', short: 'Doctor' },
+  { href: '/patient/diary',   icon: '📅', label: 'Mi Diario',    short: 'Diario' },
+  { href: '/patient/exams',   icon: '🧪', label: 'Mis Exámenes', short: 'Exámenes' },
+  { href: '/patient/habits',  icon: '🌱', label: 'Minihábitо',   short: 'Hábito' },
 ];
 
 const BOTTOM = [
@@ -146,7 +146,7 @@ export default function Sidebar() {
           return (
             <Link key={item.href} href={item.href} style={{ textDecoration: 'none', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '8px 0' }}>
               <span style={{ fontSize: 20, opacity: active ? 1 : 0.5 }}>{item.icon}</span>
-              <span style={{ fontSize: 9, fontWeight: 600, color: active ? '#3366CC' : '#7B8499' }}>{item.label.split(' ')[0]}</span>
+              <span style={{ fontSize: 9, fontWeight: 600, color: active ? '#3366CC' : '#7B8499' }}>{item.short}</span>
             </Link>
           );
         })}
