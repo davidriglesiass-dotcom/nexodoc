@@ -39,7 +39,7 @@ export default function Sidebar({ nombre = 'Paciente', puntos = 120 }: { nombre?
   return (
     <>
       {/* Desktop sidebar */}
-      <aside style={s.sidebar}>
+      <aside className="sidebar" style={s.sidebar}>
         {/* Brand — logo imagen */}
         <div style={s.brand}>
           <Image
@@ -134,7 +134,7 @@ export default function Sidebar({ nombre = 'Paciente', puntos = 120 }: { nombre?
       </aside>
 
       {/* Mobile bottom bar */}
-      <div style={s.mobileBar}>
+      <div className="mobile-bar" style={s.mobileBar}>
         {NAV.slice(0, 5).map(item => {
           const active = path === item.href || (item.href !== '/patient' && path.startsWith(item.href));
           return (
