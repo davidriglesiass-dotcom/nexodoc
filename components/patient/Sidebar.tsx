@@ -150,7 +150,7 @@ export default function Sidebar({ nombre = 'Isabella Chur', puntos = 120 }: { no
 }
 
 const s: Record<string, React.CSSProperties> = {
-  sidebar: { width: 240, minHeight: '100vh', background: '##1B3A6B', display: 'flex', flexDirection: 'column', position: 'fixed', top: 0, left: 0, zIndex: 50, fontFamily: "'Sora',sans-serif" },
+  sidebar: { width: 240, minHeight: '100vh', background: '#1B3A6B', display: 'flex', flexDirection: 'column', position: 'fixed', top: 0, left: 0, zIndex: 50, fontFamily: "'Sora',sans-serif" },
   brand: { padding: '20px 20px 16px', borderBottom: '1px solid rgba(255,255,255,0.08)' },
   userBox: { display: 'flex', alignItems: 'center', gap: 10, padding: '14px 16px 8px' },
   avatar: { width: 38, height: 38, borderRadius: '50%', background: 'rgba(255,255,255,0.15)', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, flexShrink: 0 },
