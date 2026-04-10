@@ -21,25 +21,27 @@ export default function PatientLogin() {
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true); setError('');
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, rol: 'paciente' }),
-      });
-      const data = await res.json();
-      if (!res.ok) { setError(data.message ?? 'Correo o contraseña incorrectos'); return; }
-      localStorage.setItem('mdl_token', data.token);
-      router.push('/patient');
-    } catch {
-      setError('Error de conexión. Intenta de nuevo.');
-    } finally { setLoading(false); }
+
+    // Modo demo — busca usuario registrado en localStorage
+    const stored = localStorage.getItem('mnx_user');
+    if (stored) {
+      const user = JSON.parse(stored);
+      if (user.email === email) {
+        localStorage.setItem('mdl_token', 'demo_token');
+        router.push('/patient');
+        return;
+      }
+    }
+    setError('Correo no encontrado. ¿Ya tienes cuenta?');
+    setLoading(false);
+    // René reemplaza el bloque anterior con:
+    // const res = await fetch('/api/auth/login', { method: 'POST', ... })
   }
 
   return (
     <div style={s.bg}>
       <div style={s.card}>
-        <div style={s.logo}>Nexo<span style={{ color: '#7DD3C8' }}>Doc</span></div>
+        <img src="/logo_sidebar.png" alt="MiNexoSalud" style={{ width: 180, marginBottom: 16 }} />
         <p style={s.sub}>Tu portal de salud personalizado</p>
 
         <div style={s.pills}>
@@ -47,19 +49,25 @@ export default function PatientLogin() {
           <button style={{ ...s.pill, ...(role === 'doctor' ? s.pillOn : s.pillOff) }} onClick={() => handleRole('doctor')}>Soy doctor</button>
         </div>
 
-        <button style={s.google} onClick={() => alert('Google OAuth — próximamente')}>
+        <button style={s.google} onClick={() => alert('Google — próximamente')}>
           <GoogleSVG /> Continuar con Google
         </button>
         <div style={s.divider}>o</div>
 
         <form onSubmit={handleLogin} style={{ width: '100%' }}>
           {error && <div style={s.err}>{error}</div>}
-          <Field label="Correo electrónico"><input style={s.inp} type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="nombre@ejemplo.com" required /></Field>
-          <Field label="Contraseña"><input style={s.inp} type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required /></Field>
-          <button type="submit" style={s.submit} disabled={loading}>{loading ? 'Entrando...' : 'Iniciar Sesión'}</button>
+          <Field label="Correo electrónico">
+            <input style={s.inp} type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="nombre@ejemplo.com" required />
+          </Field>
+          <Field label="Contraseña">
+            <input style={s.inp} type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required />
+          </Field>
+          <button type="submit" style={s.submit} disabled={loading}>
+            {loading ? 'Entrando...' : 'Iniciar sesión'}
+          </button>
         </form>
 
-        <p style={s.foot}>¿No tienes cuenta? <Link href="/patient/register" style={{ color: '#0E8A7A', fontWeight: 600 }}>Regístrate</Link></p>
+        <p style={s.foot}>¿No tienes cuenta? <Link href="/patient/register" style={{ color: '#0E8A7A', fontWeight: 600 }}>Regístrate gratis</Link></p>
       </div>
     </div>
   );
@@ -76,14 +84,13 @@ function GoogleSVG() {
 const s: Record<string, React.CSSProperties> = {
   bg: { minHeight: '100vh', background: '#EBF1FB', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, fontFamily: "'Sora', sans-serif" },
   card: { background: '#fff', borderRadius: 20, padding: '40px 36px', width: '100%', maxWidth: 420, boxShadow: '0 8px 40px rgba(27,58,107,0.12)', display: 'flex', flexDirection: 'column', alignItems: 'center' },
-  logo: { fontFamily: "'Lora',serif", fontSize: 28, fontWeight: 700, color: '#1B3A6B', marginBottom: 6 },
-  sub: { fontSize: 13, color: '#7B8499', marginBottom: 24, textAlign: 'center' },
+  sub: { fontSize: 13, color: '#7B8499', marginBottom: 24, textAlign: 'center' as const },
   pills: { display: 'flex', gap: 6, background: '#EEF0F4', borderRadius: 10, padding: 4, marginBottom: 24, width: '100%' },
   pill: { flex: 1, padding: '10px 0', borderRadius: 8, border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Sora',sans-serif" },
   pillOn: { background: '#1B3A6B', color: '#fff', boxShadow: '0 2px 8px rgba(27,58,107,0.2)' },
   pillOff: { background: 'transparent', color: '#7B8499' },
   google: { width: '100%', padding: '12px 0', border: '1.5px solid #D5DAE4', borderRadius: 10, background: '#fff', fontSize: 14, fontWeight: 600, color: '#3D4457', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, fontFamily: "'Sora',sans-serif" },
-  divider: { width: '100%', textAlign: 'center', margin: '0 0 16px', color: '#7B8499', fontSize: 12 },
+  divider: { width: '100%', textAlign: 'center' as const, margin: '0 0 16px', color: '#7B8499', fontSize: 12 },
   lbl: { display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '.4px', color: '#3D4457', marginBottom: 6 },
   inp: { width: '100%', padding: '12px 14px', border: '2px solid #EEF0F4', borderRadius: 10, fontSize: 14, fontFamily: "'Sora',sans-serif", color: '#111827', background: '#F8F9FB', outline: 'none', boxSizing: 'border-box' as const },
   submit: { width: '100%', padding: '13px 0', background: '#1B3A6B', color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "'Sora',sans-serif", marginTop: 4 },
